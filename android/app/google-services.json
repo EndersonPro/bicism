@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "418724950807",
+    "firebase_url": "https://reactnativejp.firebaseio.com",
+    "project_id": "reactnativejp",
+    "storage_bucket": "reactnativejp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418724950807:android:010eac08f0fc5601",
+        "android_client_info": {
+          "package_name": "com.logincli2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418724950807-bdnfts3jbtjp94eiqr2pog1s4orq4t7j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLvAYo2kQ2Q6OCm_bg926L-8rdvrMCWeM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418724950807:android:a877def3ee11e762",
+        "android_client_info": {
+          "package_name": "pro.joralmo.login"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418724950807-bdnfts3jbtjp94eiqr2pog1s4orq4t7j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLvAYo2kQ2Q6OCm_bg926L-8rdvrMCWeM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
