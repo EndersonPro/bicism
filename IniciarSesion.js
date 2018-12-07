@@ -8,14 +8,15 @@ export default class IniciarSesion extends Component {
         this.state = {
             usuario: "",
             pass: "",
-            mensaje: "",
+            mensaje: ""
         };
         this.iniciarSesion = this.iniciarSesion.bind(this);
         this.registrarse = this.registrarse.bind(this);
     }
 
     componentWillMount() {
-        firebase.auth().onAuthStateChanged((usuario) => {
+        console.log("debug")
+        var subs = firebase.auth().onAuthStateChanged((usuario) => {
             if (usuario) {
                 this.setState({
                     usuario: '',
@@ -23,11 +24,19 @@ export default class IniciarSesion extends Component {
                 });
                 this.props.navigation.replace('Inicio');
             }
-        })
+        });
+        subs();
     }
 
     iniciarSesion() {
         firebase.auth().signInWithEmailAndPassword(this.state.usuario, this.state.pass)
+            .then(() => {
+                this.setState({
+                    usuario: '',
+                    pass: ''
+                });
+                this.props.navigation.replace('Inicio');
+            })
             .catch((error) => {
                 Alert.alert(
                     "Error",

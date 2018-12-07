@@ -8,7 +8,11 @@ export default class Inicio extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      usuario: null
+      usuario: null,
+      ubicacion: {
+        latitude: null,
+        longitude: null
+      }
     }
     this.cerrarSesion = this.cerrarSesion.bind(this);
   }
@@ -17,6 +21,15 @@ export default class Inicio extends Component {
   componentWillMount() {
     let usuario = firebase.auth().currentUser;
     this.setState({ usuario });
+
+    navigator.geolocation.getCurrentPosition((pos) => {
+      let ubicacion = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      }
+      this.setState({ ubicacion });
+    });
+    console.log("debug")
   }
 
   cerrarSesion() {
@@ -83,7 +96,7 @@ export default class Inicio extends Component {
           avatar={lugar.imagen}
           key={i}
           title={lugar.nombre}
-          onPress={() => { this.props.navigation.push('Detalle', { lugar: lugar }); }}
+          onPress={() => { this.props.navigation.push('Detalle', { lugar: lugar, ubicacion: this.state.ubicacion }); }}
         />;
       lista.push(elemento);
     })
