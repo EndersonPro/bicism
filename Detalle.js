@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
+import * as poly from "@mapbox/polyline";
 
 export default class Detalle extends Component {
     constructor(props) {
@@ -8,7 +9,7 @@ export default class Detalle extends Component {
         this.state = {
             lugar: null,
             ubicacion: null,
-            res: "Soy res"
+            res: []
         }
     }
     componentWillMount() {
@@ -19,21 +20,38 @@ export default class Detalle extends Component {
             ubicacion
         });
     }
-    render() {
+    componentDidMount() {
         const mode = 'BICYCLING'; // 'walking';
-        const origin = "11.225837,-74.1890507";
-        const destination = "11.2369249,-74.1971722";
+        const origin = `${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
+        const destination = `${this.state.lugar.direccion.latitude},${this.state.lugar.direccion.longitude}`;
         const APIKEY = 'AIzaSyDyawTAYbxvKNNP-FgSnS6fNQG3R6qMV6Y'; // Maps api key
         const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${APIKEY}&mode=${mode}`;
+        console.log(url);
         fetch(url)
             .then(response => response.json())
             .then(responseJson => {
-                let res = responseJson.routes[0].legs[0].steps.length;
-                console.log("----------------------------------")
-                console.log(responseJson)
-                console.log("----------------------------------")
+                let puntos = poly.decode(
+                    responseJson.routes[0].overview_polyline.points
+                );
+                let res = puntos.map((punto, index) => {
+                    return {
+                        latitude: punto[0],
+                        longitude: punto[1]
+                    };
+                });
+                console.log("--------Inicio----------")
+                console.log(puntos);
+                console.log("--------Fin----------")
+                console.log("--------Inicio----------")
+                console.log(res);
+                console.log("--------Fin----------")
+                console.log("--------Inicio----------")
+                console.log(responseJson);
+                console.log("--------Fin----------")
                 this.setState({ res });
             }).catch(e => { console.warn(e) });
+    }
+    render() {
         return (
             <View style={estilos.contenedor}>
                 <MapView
@@ -46,7 +64,8 @@ export default class Detalle extends Component {
                         longitudeDelta: 0.0121,
                     }}
                     zoomEnabled={false}
-                    scrollEnabled={false}>
+                // scrollEnabled={false}
+                >
                     <Marker
                         coordinate={this.state.lugar.direccion}
                         title={this.state.lugar.nombre}
@@ -58,7 +77,7 @@ export default class Detalle extends Component {
                         description={"Inicio"}
                     />
                     <Polyline
-                        coordinates={[this.state.lugar.direccion, this.state.ubicacion]}
+                        coordinates={this.state.res}
                         strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
                         strokeColors={[
                             '#7F0000',
@@ -73,7 +92,8 @@ export default class Detalle extends Component {
                 </MapView>
                 <ScrollView style={estilos.texto}>
                     <Text>
-                        {this.state.res}
+                        {/* {this.state.res} */}
+                        Hola
                     </Text>
                 </ScrollView>
             </View >
