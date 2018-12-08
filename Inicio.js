@@ -52,13 +52,13 @@ export default class Inicio extends Component {
   render() {
     let lugares = [
       {
-        nombre: "Urbanización el parque",
+        nombre: "Paso del mango",
         direccion: {
-          latitude: 11.215904,
-          longitude: -74.1891454
+          latitude: 11.2019997,
+          longitude: -74.0953848
         },
         descripcion: "Lorem Ipsum dolor sit amet...",
-        imagen: require("./imagenes/elparque.jpg")
+        imagen: require("./imagenes/pasodelmango.jpg")
       },
       {
         nombre: "Universidad del magdalena",
@@ -72,8 +72,8 @@ export default class Inicio extends Component {
       {
         nombre: "Centro comercial buena vista",
         direccion: {
-          latitude: 11.2270661,
-          longitude: -74.1832583
+          latitude: 11.2277396,
+          longitude: -74.1757745
         },
         descripcion: "Lorem Ipsum dolor sit amet...",
         imagen: require("./imagenes/buenavista.jpg")

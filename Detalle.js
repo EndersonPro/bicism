@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import * as poly from "@mapbox/polyline";
+import HTML from 'react-native-render-html';
 
 export default class Detalle extends Component {
     constructor(props) {
@@ -9,7 +10,8 @@ export default class Detalle extends Component {
         this.state = {
             lugar: null,
             ubicacion: null,
-            res: []
+            res: [],
+            pasos: []
         }
     }
     componentWillMount() {
@@ -21,11 +23,11 @@ export default class Detalle extends Component {
         });
     }
     componentDidMount() {
-        const mode = 'BICYCLING'; // 'walking';
-        const origin = `${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
+        const mode = "WALKING";//'bicycling'; // 'walking';
+        const origin = "11.2174962,-74.1866339";//`${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
         const destination = `${this.state.lugar.direccion.latitude},${this.state.lugar.direccion.longitude}`;
         const APIKEY = 'AIzaSyDyawTAYbxvKNNP-FgSnS6fNQG3R6qMV6Y'; // Maps api key
-        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${APIKEY}&mode=${mode}`;
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${APIKEY}&mode=${mode}&language=es`;
         console.log(url);
         fetch(url)
             .then(response => response.json())
@@ -39,6 +41,7 @@ export default class Detalle extends Component {
                         longitude: punto[1]
                     };
                 });
+                let pasos = responseJson.routes[0].legs[0].steps;
                 console.log("--------Inicio----------")
                 console.log(puntos);
                 console.log("--------Fin----------")
@@ -46,9 +49,9 @@ export default class Detalle extends Component {
                 console.log(res);
                 console.log("--------Fin----------")
                 console.log("--------Inicio----------")
-                console.log(responseJson);
+                console.log(responseJson.routes[0].legs[0].steps);
                 console.log("--------Fin----------")
-                this.setState({ res });
+                this.setState({ res, pasos });
             }).catch(e => { console.warn(e) });
     }
     render() {
@@ -60,10 +63,10 @@ export default class Detalle extends Component {
                     region={{
                         latitude: this.state.lugar.direccion.latitude,
                         longitude: this.state.lugar.direccion.longitude,
-                        latitudeDelta: 0.015,
-                        longitudeDelta: 0.0121,
+                        latitudeDelta: 10,
+                        longitudeDelta: 10,
                     }}
-                    zoomEnabled={false}
+                    showsUserLocation={true}
                 // scrollEnabled={false}
                 >
                     <Marker
@@ -91,10 +94,11 @@ export default class Detalle extends Component {
                     />
                 </MapView>
                 <ScrollView style={estilos.texto}>
-                    <Text>
-                        {/* {this.state.res} */}
-                        Hola
-                    </Text>
+                    {this.state.pasos.map((paso, key) =>
+                        (
+                            <HTML html={paso.html_instructions} key={key} />
+                        )
+                    )}
                 </ScrollView>
             </View >
         )
