@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import * as poly from "@mapbox/polyline";
 import HTML from 'react-native-render-html';
+import { Badge, Icon } from 'react-native-elements';
 
 export default class Detalle extends Component {
     constructor(props) {
@@ -12,9 +13,18 @@ export default class Detalle extends Component {
             ubicacion: null,
             res: [],
             pasos: [],
-            puntoZoom: null
+            puntoZoom: null,
+            distancia: 0,
+            // tiempo: 0
         }
     }
+
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: navigation.getParam('lugar').nombre,
+        };
+    };
+
     componentWillMount() {
         let lugar = this.props.navigation.getParam('lugar');
         let ubicacion = this.props.navigation.getParam('ubicacion');
@@ -55,11 +65,14 @@ export default class Detalle extends Component {
                 let pasos = responseJson.routes[0].legs[0].steps;
                 let distancia = this.getKilometros(11.2174962, -74.1866339, this.state.lugar.direccion.latitude, this.state.lugar.direccion.longitude) / 2;
                 let suma = 0;
+                // let tiempo = 0;
                 for (let i in pasos) {
                     suma = suma + pasos[i].distance.value;
+                    // tiempo = tiempo + pasos[i].duration.value;
                     if (suma >= distancia * 1000) {
+                        let decode = pasos[parseInt(i) + 1] != null ? pasos[parseInt(i) + 1] : pasos[i];
                         let resPunto = poly.decode(
-                            pasos[parseInt(i) + 1].polyline.points
+                            decode.polyline.points
                         );
                         resPunto = {
                             latitude: resPunto[0][0],
@@ -68,9 +81,11 @@ export default class Detalle extends Component {
                         this.setState({
                             puntoZoom: resPunto
                         });
-                        break;
                     }
                 }
+                this.setState({
+                    distancia: suma
+                });
                 // console.log("--------Inicio----------")
                 // console.log(puntos);
                 // console.log("--------Fin----------")
@@ -91,6 +106,7 @@ export default class Detalle extends Component {
         console.log("--------Inicio----------")
         console.log(this.state.res.length);
         console.log(div);
+        console.log("PASO POR AQUÍ");
         console.log("--------Fin----------")
         let distancia = 0;
         return (
@@ -119,24 +135,92 @@ export default class Detalle extends Component {
                     />
                     <Polyline
                         coordinates={this.state.res}
-                        strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-                        strokeColors={[
-                            '#7F0000',
-                            '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                            '#B24112',
-                            '#E5845C',
-                            '#238C23',
-                            '#7F0000'
-                        ]}
+                        strokeColor="red"
                         strokeWidth={6}
                     />
                 </MapView>
                 <ScrollView style={estilos.texto}>
-                    {this.state.pasos.map((paso, key) =>
-                        (
-                            <HTML html={paso.html_instructions} key={key} />
-                        )
-                    )}
+                    {/* Puse esto */}
+
+                    <View>
+                        <View style={styles.container}>
+                            <View style={styles.dateContainer}>
+                                <Text style={styles.darkText}>Distanca</Text>
+                                {/* <Text style={styles.lightText}>Ida y vuelta aprox</Text> */}
+                            </View>
+                            <Icon
+                                reverse
+                                name='directions'
+                                color='#000'
+                                style={styles.icon}
+                            />
+                            <View>
+                                <View style={styles.tempContainer}>
+                                    <Text style={styles.darkText}>{(this.state.distancia * 2 / 1000).toFixed(1)}</Text>
+                                    <Text style={styles.darkText}> Km</Text>
+                                    <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
+                                    {/* <Text style={styles.darkText}>C</Text> */}
+                                </View>
+                                <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text>
+                                {/* <Text style={styles.lightText}>Humidity: 47%</Text> */}
+                            </View>
+                        </View>
+                        <View style={styles.separator} />
+                    </View>
+
+                    <View>
+                        <View style={styles.container}>
+                            <View style={styles.dateContainer}>
+                                <Text style={styles.darkText}>Terreno</Text>
+                                {/* <Text style={styles.lightText}>Ida y vuelta aprox</Text> */}
+                            </View>
+                            <Icon
+                                reverse
+                                name='map'
+                                color='#000'
+                                style={styles.icon}
+                            />
+                            <View>
+                                <View style={styles.tempContainer}>
+                                    <Text style={styles.darkText}>{this.state.lugar.terreno}</Text>
+                                    {/* <Text style={styles.darkText}> Km</Text> */}
+                                    {/* <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text> */}
+                                    {/* <Text style={styles.darkText}>C</Text> */}
+                                </View>
+                                {/* <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text> */}
+                                {/* <Text style={styles.lightText}>Humidity: 47%</Text> */}
+                            </View>
+                        </View>
+                        <View style={styles.separator} />
+                    </View>
+
+                    <View>
+                        <View style={styles.container}>
+                            <View style={styles.dateContainer}>
+                                <Text style={styles.darkText}>Tiempo</Text>
+                                {/* <Text style={styles.lightText}>Ida y vuelta aprox</Text> */}
+                            </View>
+                            <Icon
+                                reverse
+                                name='access-time'
+                                color='#000'
+                                style={styles.icon}
+                            />
+                            <View>
+                                <View style={styles.tempContainer}>
+                                    <Text style={styles.darkText}>{this.state.lugar.tiempo}</Text>
+                                    <Text style={styles.darkText}>min</Text>
+                                    <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
+                                    {/* <Text style={styles.darkText}>C</Text> */}
+                                </View>
+                                <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text>
+                                {/* <Text style={styles.lightText}>Humidity: 47%</Text> */}
+                            </View>
+                        </View>
+                        <View style={styles.separator} />
+                    </View>
+
+                    {/* Puse esto */}
                 </ScrollView>
             </View >
         )
@@ -146,7 +230,7 @@ export default class Detalle extends Component {
 const estilos = StyleSheet.create({
     contenedor: {
         flex: 1,
-        backgroundColor: 'tomato',
+        backgroundColor: '#F8F8F8',
     },
     mapa: {
         flex: 1
@@ -154,5 +238,48 @@ const estilos = StyleSheet.create({
     texto: {
         flex: 3,
         textAlign: 'center',
+    }
+});
+
+var styles = StyleSheet.create({
+    listContainer: {
+        backgroundColor: '#f2f2f2'
+    },
+    container: {
+        flex: 1,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 10,
+        paddingBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center', //flex-start, flex-end, center, stretch
+    },
+    dateContainer: {
+        alignItems: 'center',
+        marginRight: 20
+    },
+    separator: {
+        height: 1,
+        backgroundColor: '#dddddd'
+    },
+    icon: {
+        width: 75,
+        height: 75,
+        marginRight: 20
+    },
+    tempContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
+    },
+    darkText: {
+        fontSize: 18
+    },
+    lightText: {
+        color: "#9a9a9a"
+    },
+    slightMargin: {
+        marginRight: 1
     }
 });

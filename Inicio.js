@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, ScrollView, Alert } from 'react-native';
+import { Text, ScrollView, Alert } from 'react-native';
 import firebase from 'react-native-firebase';
-import { Card, ListItem, Button, List } from 'react-native-elements'
+import { Card, Button } from 'react-native-elements'
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 
 export default class Inicio extends Component {
@@ -29,7 +29,6 @@ export default class Inicio extends Component {
       }
       this.setState({ ubicacion });
     });
-    console.log("debug")
   }
 
   cerrarSesion() {
@@ -58,54 +57,69 @@ export default class Inicio extends Component {
           longitude: -74.0953848
         },
         descripcion: "Lorem Ipsum dolor sit amet...",
-        imagen: require("./imagenes/pasodelmango.jpg")
+        imagen: require("./imagenes/pasodelmango.jpg"),
+        terreno: "Carretera + Trocha",
+        tiempo: "1 hora 0 "
       },
       {
-        nombre: "Universidad del magdalena",
+        nombre: "Parque tayrona - Rio piedra",
         direccion: {
-          latitude: 11.2265303,
-          longitude: -74.1906627
+          latitude: 11.281336,
+          longitude: -73.907958
         },
         descripcion: "Lorem Ipsum dolor sit amet...",
-        imagen: require("./imagenes/unimag.jpg")
+        imagen: require("./imagenes/parquetayrona.jpg"),
+        terreno: "Carretera",
+        tiempo: "2 horas 36 "
       },
       {
-        nombre: "Centro comercial buena vista",
+        nombre: "Bahia concha",
         direccion: {
-          latitude: 11.2277396,
-          longitude: -74.1757745
+          latitude: 11.2918397,
+          longitude: -74.1552247
         },
         descripcion: "Lorem Ipsum dolor sit amet...",
-        imagen: require("./imagenes/buenavista.jpg")
+        imagen: require("./imagenes/bahiaconcha.jpg"),
+        terreno: "Carretera + Trocha",
+        tiempo: "1 hora 6 "
       },
       {
-        nombre: "Centro comercial ocean mall",
+        nombre: "Cascadas de marinca",
         direccion: {
-          latitude: 11.2306677,
-          longitude: -74.1939096
+          latitude: 11.1191412,
+          longitude: -74.1204932
         },
         descripcion: "Lorem Ipsum dolor sit amet...",
-        imagen: require("./imagenes/oceanmall.jpg")
+        imagen: require("./imagenes/cascadasdemarinca.jpg"),
+        terreno: "Carretera + trocha",
+        tiempo: "1 hora 46 "
       }
     ];
     let lista = [];
     lugares.map((lugar, i) => {
       let elemento =
-        <ListItem
-          roundAvatar
-          avatar={lugar.imagen}
-          key={i}
+        <Card
           title={lugar.nombre}
-          onPress={() => { this.props.navigation.push('Detalle', { lugar: lugar, ubicacion: this.state.ubicacion }); }}
-        />;
+          image={lugar.imagen}
+          key={i}>
+          <Text style={{ marginBottom: 10 }}>
+            {lugar.descripcion}
+          </Text>
+          <Button
+            icon={{ name: 'code' }}
+            backgroundColor='#03A9F4'
+            buttonStyle={{ borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0 }}
+            onPress={() => { this.props.navigation.push('Detalle', { lugar: lugar, ubicacion: this.state.ubicacion }); }}
+            title='Ver ruta' />
+        </Card>;
       lista.push(elemento);
     })
     return (
       <ScrollView>
-        <List containerStyle={{ marginBottom: 20 }}>
+        {/* <List containerStyle={{ marginBottom: 20 }}> */}
           {lista}
-        </List>
-        <Button
+        {/* </List> */}
+        {/* <Button
           onPress={this.cerrarSesion}
           title="Cerrar sesión"
         />
@@ -114,7 +128,7 @@ export default class Inicio extends Component {
         </Text>
         <Button
           title="Detalles"
-        />
+        /> */}
       </ScrollView>
     )
   }
