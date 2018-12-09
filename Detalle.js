@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import * as poly from "@mapbox/polyline";
 import HTML from 'react-native-render-html';
@@ -15,8 +15,11 @@ export default class Detalle extends Component {
             pasos: [],
             puntoZoom: null,
             distancia: 0,
+            poner: null,
+            loader: true
             // tiempo: 0
         }
+        this.ponerMarker = this.ponerMarker.bind(this);
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -24,6 +27,22 @@ export default class Detalle extends Component {
             title: navigation.getParam('lugar').nombre,
         };
     };
+
+    ponerMarker(key) {
+        let pasoMarker = this.state.pasos[key];
+        pasoMarker = poly.decode(
+            pasoMarker.polyline.points
+        );
+        pasoMarker = {
+            latitude: pasoMarker[0][0],
+            longitude: pasoMarker[0][1]
+        }
+        let marker = <Marker
+            coordinate={pasoMarker}
+            title={`Paso ${key}`}
+        />
+        this.setState({ poner: marker });
+    }
 
     componentWillMount() {
         let lugar = this.props.navigation.getParam('lugar');
@@ -65,10 +84,8 @@ export default class Detalle extends Component {
                 let pasos = responseJson.routes[0].legs[0].steps;
                 let distancia = this.getKilometros(11.2174962, -74.1866339, this.state.lugar.direccion.latitude, this.state.lugar.direccion.longitude) / 2;
                 let suma = 0;
-                // let tiempo = 0;
                 for (let i in pasos) {
                     suma = suma + pasos[i].distance.value;
-                    // tiempo = tiempo + pasos[i].duration.value;
                     if (suma >= distancia * 1000) {
                         let decode = pasos[parseInt(i) + 1] != null ? pasos[parseInt(i) + 1] : pasos[i];
                         let resPunto = poly.decode(
@@ -86,16 +103,8 @@ export default class Detalle extends Component {
                 this.setState({
                     distancia: suma
                 });
-                // console.log("--------Inicio----------")
-                // console.log(puntos);
-                // console.log("--------Fin----------")
-                // console.log("--------Inicio----------")
-                // console.log(res);
-                // console.log("--------Fin----------")
-                // console.log("--------Inicio----------")
-                // console.log(responseJson.routes[0].legs[0].steps);
-                // console.log("--------Fin----------")
                 this.setState({ res, pasos });
+                this.setState({ loader: false });
             }).catch(e => { console.warn(e) });
     }
     render() {
@@ -103,125 +112,168 @@ export default class Detalle extends Component {
         let zoom = (this.state.res.length * 0.15) / 358;
         div = this.state.res.length / div;
         div = Math.round(div);
-        console.log("--------Inicio----------")
-        console.log(this.state.res.length);
-        console.log(div);
-        console.log("PASO POR AQUÍ");
-        console.log("--------Fin----------")
         let distancia = 0;
         return (
             <View style={estilos.contenedor}>
-                <MapView
-                    provider={PROVIDER_GOOGLE}
-                    style={estilos.mapa}
-                    region={{
-                        latitude: this.state.puntoZoom != null ? this.state.puntoZoom.latitude : 0,
-                        longitude: this.state.puntoZoom != null ? this.state.puntoZoom.longitude : 0,
-                        latitudeDelta: zoom,
-                        longitudeDelta: zoom,
-                    }}
-                    showsUserLocation={true}
-                // scrollEnabled={false}
-                >
-                    <Marker
-                        coordinate={this.state.lugar.direccion}
-                        title={this.state.lugar.nombre}
-                        description={"Fin"}
-                    />
-                    <Marker
-                        coordinate={this.state.ubicacion}
-                        title={"Tu ubicación"}
-                        description={"Inicio"}
-                    />
-                    <Polyline
-                        coordinates={this.state.res}
-                        strokeColor="red"
-                        strokeWidth={6}
-                    />
-                </MapView>
-                <ScrollView style={estilos.texto}>
-                    {/* Puse esto */}
-
-                    <View>
-                        <View style={styles.container}>
-                            <View style={styles.dateContainer}>
-                                <Text style={styles.darkText}>Distanca</Text>
-                                {/* <Text style={styles.lightText}>Ida y vuelta aprox</Text> */}
-                            </View>
-                            <Icon
-                                reverse
-                                name='directions'
-                                color='#000'
-                                style={styles.icon}
-                            />
-                            <View>
-                                <View style={styles.tempContainer}>
-                                    <Text style={styles.darkText}>{(this.state.distancia * 2 / 1000).toFixed(1)}</Text>
-                                    <Text style={styles.darkText}> Km</Text>
-                                    <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
-                                    {/* <Text style={styles.darkText}>C</Text> */}
+                {
+                    this.state.loader ?
+                        <ActivityIndicator size="large" color="#ff0000" />
+                        :
+                        <View style={estilos.contenedor}>
+                            <MapView
+                                provider={PROVIDER_GOOGLE}
+                                style={estilos.mapa}
+                                region={{
+                                    latitude: this.state.puntoZoom != null ? this.state.puntoZoom.latitude : 0,
+                                    longitude: this.state.puntoZoom != null ? this.state.puntoZoom.longitude : 0,
+                                    latitudeDelta: zoom,
+                                    longitudeDelta: zoom,
+                                }}
+                                showsUserLocation={true}
+                            >
+                                <Marker
+                                    coordinate={this.state.lugar.direccion}
+                                    title={this.state.lugar.nombre}
+                                    description={"Fin"}
+                                />
+                                <Marker
+                                    coordinate={this.state.ubicacion}
+                                    title={"Tu ubicación"}
+                                    description={"Inicio"}
+                                />
+                                {this.state.poner}
+                                <Polyline
+                                    coordinates={this.state.res}
+                                    strokeColor="red"
+                                    strokeWidth={6}
+                                />
+                            </MapView>
+                            <ScrollView style={estilos.texto}>
+                                <View>
+                                    <View style={styles.container}>
+                                        <View style={styles.dateContainer}>
+                                            <Text style={styles.darkText}>Distanca </Text>
+                                        </View>
+                                        <Icon
+                                            reverse
+                                            name='directions-bike'
+                                            color='#000'
+                                            style={styles.icon}
+                                        />
+                                        <View>
+                                            <View style={styles.tempContainer}>
+                                                <Text style={styles.darkText}>{(this.state.distancia * 2 / 1000).toFixed(1)}</Text>
+                                                <Text style={styles.darkText}> Km</Text>
+                                                <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
+                                                {/* <Text style={styles.darkText}>C</Text> */}
+                                            </View>
+                                            <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text>
+                                        </View>
+                                    </View>
+                                    <View style={styles.separator} />
                                 </View>
-                                <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text>
-                                {/* <Text style={styles.lightText}>Humidity: 47%</Text> */}
-                            </View>
-                        </View>
-                        <View style={styles.separator} />
-                    </View>
 
-                    <View>
-                        <View style={styles.container}>
-                            <View style={styles.dateContainer}>
-                                <Text style={styles.darkText}>Terreno</Text>
-                                {/* <Text style={styles.lightText}>Ida y vuelta aprox</Text> */}
-                            </View>
-                            <Icon
-                                reverse
-                                name='map'
-                                color='#000'
-                                style={styles.icon}
-                            />
-                            <View>
-                                <View style={styles.tempContainer}>
-                                    <Text style={styles.darkText}>{this.state.lugar.terreno}</Text>
-                                    {/* <Text style={styles.darkText}> Km</Text> */}
-                                    {/* <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text> */}
-                                    {/* <Text style={styles.darkText}>C</Text> */}
+                                <View>
+                                    <View style={styles.container}>
+                                        <View style={styles.dateContainer}>
+                                            <Text style={styles.darkText}>Terreno   </Text>
+                                        </View>
+                                        <Icon
+                                            reverse
+                                            name='map'
+                                            color='#000'
+                                            style={styles.icon}
+                                        />
+                                        <View>
+                                            <View style={styles.tempContainer}>
+                                                <Text style={styles.darkText}>{this.state.lugar.terreno}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <View style={styles.separator} />
                                 </View>
-                                {/* <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text> */}
-                                {/* <Text style={styles.lightText}>Humidity: 47%</Text> */}
-                            </View>
-                        </View>
-                        <View style={styles.separator} />
-                    </View>
 
-                    <View>
-                        <View style={styles.container}>
-                            <View style={styles.dateContainer}>
-                                <Text style={styles.darkText}>Tiempo</Text>
-                                {/* <Text style={styles.lightText}>Ida y vuelta aprox</Text> */}
-                            </View>
-                            <Icon
-                                reverse
-                                name='access-time'
-                                color='#000'
-                                style={styles.icon}
-                            />
-                            <View>
-                                <View style={styles.tempContainer}>
-                                    <Text style={styles.darkText}>{this.state.lugar.tiempo}</Text>
-                                    <Text style={styles.darkText}>min</Text>
-                                    <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
-                                    {/* <Text style={styles.darkText}>C</Text> */}
+                                <View>
+                                    <View style={styles.container}>
+                                        <View style={styles.dateContainer}>
+                                            <Text style={styles.darkText}>Tiempo    </Text>
+                                        </View>
+                                        <Icon
+                                            reverse
+                                            name='access-time'
+                                            color='#000'
+                                            style={styles.icon}
+                                        />
+                                        <View>
+                                            <View style={styles.tempContainer}>
+                                                <Text style={styles.darkText}>{this.state.lugar.tiempo}</Text>
+                                                <Text style={styles.darkText}>min</Text>
+                                                <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
+                                            </View>
+                                            <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text>
+                                        </View>
+                                    </View>
+                                    <View style={styles.separator} />
                                 </View>
-                                <Text style={styles.lightText}>Ida y vuelta aproximadamente</Text>
-                                {/* <Text style={styles.lightText}>Humidity: 47%</Text> */}
-                            </View>
-                        </View>
-                        <View style={styles.separator} />
-                    </View>
 
-                    {/* Puse esto */}
-                </ScrollView>
+                                <View>
+                                    <View style={styles.container}>
+                                        <View style={styles.dateContainer}>
+                                            <Text style={styles.darkText}>Altimetria</Text>
+                                        </View>
+                                        <Icon
+                                            reverse
+                                            name='trending-up'
+                                            color='#000'
+                                            style={styles.icon}
+                                        />
+                                        <View>
+                                            <View style={styles.tempContainer}>
+                                                <Text style={styles.darkText}>{this.state.lugar.altura}</Text>
+                                                <Text style={styles.darkText}> m</Text>
+                                                <Text style={[styles.darkText, styles.slightMargin]}> Aprox</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <View style={styles.separator} />
+                                </View>
+                                <View>
+                                    <View style={styles.container}>
+                                        <Icon
+                                            reverse
+                                            name='list'
+                                            color='#000'
+                                            style={styles.icon}
+                                        />
+                                        <View>
+                                            <View style={styles.tempContainer}>
+                                                <Text style={styles.darkText}>Instrucciones de la ruta</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <View style={styles.separator} />
+                                </View>
+                                {this.state.pasos.map((paso, key) =>
+                                    (
+                                        <TouchableOpacity key={key} onPress={() => this.ponerMarker(key)}>
+                                            <View style={styles.container}>
+                                                <Badge
+                                                    value={key}
+                                                    textStyle={{ color: 'white' }}
+                                                />
+                                                <View style={{ padding: 10 }}>
+                                                    <View style={styles.tempContainer}>
+                                                        <HTML style={styles.darkText} html={paso.html_instructions} />
+                                                    </View>
+                                                </View>
+                                            </View>
+                                            <View style={styles.separator} />
+                                        </TouchableOpacity>
+                                    )
+                                )}
+                            </ScrollView>
+                        </View>
+                }
             </View >
         )
     }
@@ -231,6 +283,7 @@ const estilos = StyleSheet.create({
     contenedor: {
         flex: 1,
         backgroundColor: '#F8F8F8',
+        justifyContent: "center"
     },
     mapa: {
         flex: 1
@@ -238,7 +291,8 @@ const estilos = StyleSheet.create({
     texto: {
         flex: 3,
         textAlign: 'center',
-    }
+    },
+
 });
 
 var styles = StyleSheet.create({
