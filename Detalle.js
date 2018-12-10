@@ -16,7 +16,8 @@ export default class Detalle extends Component {
             puntoZoom: null,
             distancia: 0,
             poner: null,
-            loader: true
+            loader: true,
+            region: null,
             // tiempo: 0
         }
         this.ponerMarker = this.ponerMarker.bind(this);
@@ -42,6 +43,14 @@ export default class Detalle extends Component {
             title={`Paso ${key}`}
         />
         this.setState({ poner: marker });
+        let zoom = 0.01;
+        let region = {
+            latitude: pasoMarker.latitude,
+            longitude: pasoMarker.longitude,
+            latitudeDelta: zoom,
+            longitudeDelta: zoom,
+        };
+        this.setState({ region });
     }
 
     componentWillMount() {
@@ -64,11 +73,10 @@ export default class Detalle extends Component {
     }
     componentDidMount() {
         const mode = "WALKING";//'bicycling'; // 'walking';
-        const origin = "11.2174962,-74.1866339";//`${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
+        const origin = "11.2174962,-74.1866339"//`${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
         const destination = `${this.state.lugar.direccion.latitude},${this.state.lugar.direccion.longitude}`;
         const APIKEY = 'AIzaSyDyawTAYbxvKNNP-FgSnS6fNQG3R6qMV6Y'; // Maps api key
         const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${APIKEY}&mode=${mode}&language=es`;
-        console.log(url);
         fetch(url)
             .then(response => response.json())
             .then(responseJson => {
@@ -105,14 +113,20 @@ export default class Detalle extends Component {
                 });
                 this.setState({ res, pasos });
                 this.setState({ loader: false });
+                let zoom = (this.state.res.length * 0.15) / 358;
+                let region = {
+                    latitude: this.state.puntoZoom != null ? this.state.puntoZoom.latitude : 0,
+                    longitude: this.state.puntoZoom != null ? this.state.puntoZoom.longitude : 0,
+                    latitudeDelta: zoom,
+                    longitudeDelta: zoom,
+                };
+                this.setState({ region });
             }).catch(e => { console.warn(e) });
     }
     render() {
         let div = 4;
-        let zoom = (this.state.res.length * 0.15) / 358;
         div = this.state.res.length / div;
         div = Math.round(div);
-        let distancia = 0;
         return (
             <View style={estilos.contenedor}>
                 {
@@ -123,12 +137,7 @@ export default class Detalle extends Component {
                             <MapView
                                 provider={PROVIDER_GOOGLE}
                                 style={estilos.mapa}
-                                region={{
-                                    latitude: this.state.puntoZoom != null ? this.state.puntoZoom.latitude : 0,
-                                    longitude: this.state.puntoZoom != null ? this.state.puntoZoom.longitude : 0,
-                                    latitudeDelta: zoom,
-                                    longitudeDelta: zoom,
-                                }}
+                                region={this.state.region}
                                 showsUserLocation={true}
                             >
                                 <Marker
@@ -292,7 +301,6 @@ const estilos = StyleSheet.create({
         flex: 3,
         textAlign: 'center',
     },
-
 });
 
 var styles = StyleSheet.create({
