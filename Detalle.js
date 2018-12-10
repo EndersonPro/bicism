@@ -73,7 +73,7 @@ export default class Detalle extends Component {
     }
     componentDidMount() {
         const mode = "WALKING";//'bicycling'; // 'walking';
-        const origin = "11.2174962,-74.1866339"//`${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
+        const origin = `${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
         const destination = `${this.state.lugar.direccion.latitude},${this.state.lugar.direccion.longitude}`;
         const APIKEY = 'AIzaSyDyawTAYbxvKNNP-FgSnS6fNQG3R6qMV6Y'; // Maps api key
         const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${APIKEY}&mode=${mode}&language=es`;
