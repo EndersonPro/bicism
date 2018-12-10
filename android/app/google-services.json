@@ -8,6 +8,37 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:418724950807:android:c5f8fcf2b4f5a474",
+        "android_client_info": {
+          "package_name": "com.bicism"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418724950807-bdnfts3jbtjp94eiqr2pog1s4orq4t7j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLvAYo2kQ2Q6OCm_bg926L-8rdvrMCWeM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:418724950807:android:010eac08f0fc5601",
         "android_client_info": {
           "package_name": "com.logincli2"

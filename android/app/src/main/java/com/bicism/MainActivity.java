@@ -1,4 +1,4 @@
-package com.logincli2;
+package com.bicism;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -14,7 +14,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "loginCli2";
+        return "BiciSM";
     }
 
     @Override
@@ -26,4 +26,5 @@ public class MainActivity extends ReactActivity {
             }
         };
     }
+
 }

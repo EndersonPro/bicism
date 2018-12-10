@@ -1,4 +1,4 @@
-package com.logincli2;
+package com.bicism;
 
 import android.app.Application;
 
@@ -14,6 +14,7 @@ import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,13 +29,14 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-          new MapsPackage(),
-          new VectorIconsPackage(),
-          new RNGestureHandlerPackage(),
-          new RNFirebasePackage(),
-          new RNFirebaseAuthPackage(),
-          new RNFirebaseFirestorePackage()
+        new MainReactPackage(),
+        new MapsPackage(),
+        new VectorIconsPackage(),
+        new RNGestureHandlerPackage(),
+        new RNFirebasePackage(),
+        new RNFirebaseAuthPackage(),
+        new RNFirebaseFirestorePackage()
+
       );
     }
 
