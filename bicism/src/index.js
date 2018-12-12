@@ -3,28 +3,23 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+
+
 import rootReducer from './store/reducers/rootReducer';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import { reduxFirestore, getFirestore } from 'redux-firestore';
+import { reactReduxFirebase, getFirebase } from 'react-redux-firebase';
+import fbConfig from './config/fbConfig'
 
-/* const reducer = (state, action) => {
-    var newState = Object.assign({}, state);
-
-    switch (action.type) {
-        case 'AUM':
-            newState.count = state.count + 1;
-            return newState;
-        default:
-            return state;
-    }
-
-}
-
-const state = {
-    count: 2
-} */
-
-const store = createStore(rootReducer);
+const store = createStore(rootReducer,
+    compose(
+        applyMiddleware(thunk.withExtraArgument({ getFirestore, getFirebase })),
+        reduxFirestore(fbConfig),
+        reactReduxFirebase(fbConfig)
+    )
+);
 
 ReactDOM.render(
     <Provider store={store}>
