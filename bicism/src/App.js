@@ -1,23 +1,24 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import Navbar from './components/layout/Navbar';
+import Dashboard from './components/dashboard/Dashboard'
+import RutesDetails from './components/rutes/RuteDetails'
 
 import { connect } from 'react-redux';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          {this.props.info}
-          <button onClick={this.props.aumentar}> Aumentar </button>
-          <br></br>
-        </header>
-      </div>
+      <BrowserRouter>
+        <div className="App">
+          <Navbar />
+          <Switch>
+            <Route exact path="/" component={Dashboard} />
+            <Route path="/ruta/:id" component={RutesDetails}/>
+          </Switch>
+        </div>
+      </BrowserRouter>
     );
   }
 }
