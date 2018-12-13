@@ -23,7 +23,6 @@ class Dashboard extends Component {
 
 
 const mapStateToProps = state => {
-  console.log(state)
   return {
     rutes: state.rutes.rutes
   }

@@ -11,12 +11,14 @@ const authReducer = (state = initState, action) => {
                 authError: 'Fallo en el inicio de sesion'
             };
         case 'LOGIN_SUCCESS':
-            console.log('Login failed');
-
+            console.log('Login Success');
             return {
                 ...state,
                 authError: null
             };
+        case 'SIGNOUT_SUCCESS':
+            console.log('Cerrar Sesion Satisfatorio');
+            return state;
         default:
             return state;
     }
