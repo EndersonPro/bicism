@@ -34,6 +34,9 @@ local.properties
 #
 bicism/node_modules
 bicism/package-lock.json
+bicism/.firebase
+bicism/build
+bicism/dist
 node_modules/
 npm-debug.log
 yarn-error.log

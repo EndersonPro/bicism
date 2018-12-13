@@ -1,6 +1,7 @@
 const initState = {
     rutes: [
         {
+            id: 1,
             altura: "620",
             descripcion: "Ruta a las hermosas cascadas de marinca",
             direccion: {
@@ -13,6 +14,7 @@ const initState = {
             tiempo: "1 hora 46"
         },
         {
+            id: 2,
             altura: "720",
             descripcion: "Ruta a mi casa",
             direccion: {
