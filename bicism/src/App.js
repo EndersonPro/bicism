@@ -7,7 +7,6 @@ import RutesDetails from './components/rutes/RuteDetails'
 import SignIn from './components/auth/SignIn'
 import SignUp from './components/auth/SignUp'
 
-
 import { connect } from 'react-redux';
 
 class App extends Component {

@@ -4,11 +4,14 @@ import RutesList from '../rutes/RutesList'
 import { connect } from 'react-redux'
 import { firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
+import { Redirect } from 'react-router-dom'
+
 
 class Dashboard extends Component {
   render() {
     //console.log(this.props)
-    const { rutes } = this.props;
+    const { rutes, auth } = this.props;
+    if (!auth.uid) return <Redirect to="/iniciarSesion" />
     return (
       <div className="dashboard container">
         <div className="row">
@@ -24,7 +27,8 @@ class Dashboard extends Component {
 
 const mapStateToProps = state => {
   return {
-    rutes: state.rutes.rutes
+    rutes: state.rutes.rutes,
+    auth: state.firebase.auth
   }
 }
 

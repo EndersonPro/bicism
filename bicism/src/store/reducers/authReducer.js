@@ -19,6 +19,18 @@ const authReducer = (state = initState, action) => {
         case 'SIGNOUT_SUCCESS':
             console.log('Cerrar Sesion Satisfatorio');
             return state;
+        case 'SIGNUP_SUCCES':
+            console.log('Registro completo');
+            return {
+                ...state,
+                authError: null
+            }
+        case 'SIGNUP_ERROR':
+            console.log('Error en el registrp');
+            return {
+                ...state,
+                authError: action.err.message
+            }
         default:
             return state;
     }

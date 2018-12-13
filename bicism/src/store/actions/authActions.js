@@ -22,3 +22,24 @@ export const signOut = () => {
         })
     }
 }
+
+export const signUp = (newUser) => {
+    return (dispatch, getState, { getFirebase, getFirestore }) => {
+        const firebase = getFirebase();
+        const firestore = getFirestore()
+        console.log(newUser)
+        firebase.auth().createUserWithEmailAndPassword(
+            newUser.email,
+            newUser.password
+        ).then((res) => {
+            return res.user.updateProfile({
+                displayName: newUser.name,
+                photoURL: ""
+            })
+        }).then(() => {
+            dispatch({ type: 'SIGNUP_SUCCES' })
+        }).catch(err => {
+            dispatch({ type: 'SIGNUP_ERROR', err })
+        })
+    }
+}
