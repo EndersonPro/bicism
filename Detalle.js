@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Alert, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import * as poly from "@mapbox/polyline";
 import HTML from 'react-native-render-html';
@@ -71,57 +71,77 @@ export default class Detalle extends Component {
         var d = R * c;
         return d.toFixed(3);
     }
-    componentDidMount() {
+    cargarRuta(deNuevo = false) {
         const mode = "WALKING";//'bicycling'; // 'walking';
-        const origin = `${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;//"11.2174962,-74.1866339";
+        let origin;
+        if (deNuevo) {
+            Alert.alert(
+                "¡Hey!",
+                "No hemos podido cargar la ruta desde tu ubicación, y hemos tomado como punto de partida una ubicación cerca del centro comercial Ocean Mall",
+                [
+                    { text: "Continuar", onPress: () => console.log("Continuar") }
+                ]
+            );
+            origin = "11.2313106,-74.2015277";
+        } else {
+            origin = `${this.state.ubicacion.latitude},${this.state.ubicacion.longitude}`;
+        }
         const destination = `${this.state.lugar.direccion.latitude},${this.state.lugar.direccion.longitude}`;
         const APIKEY = 'AIzaSyDyawTAYbxvKNNP-FgSnS6fNQG3R6qMV6Y'; // Maps api key
         const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${APIKEY}&mode=${mode}&language=es`;
+        console.log(url);
         fetch(url)
             .then(response => response.json())
             .then(responseJson => {
-                let puntos = poly.decode(
-                    responseJson.routes[0].overview_polyline.points
-                );
-                let res = puntos.map((punto, index) => {
-                    return {
-                        latitude: punto[0],
-                        longitude: punto[1]
-                    };
-                });
-                let pasos = responseJson.routes[0].legs[0].steps;
-                let distancia = this.getKilometros(11.2174962, -74.1866339, this.state.lugar.direccion.latitude, this.state.lugar.direccion.longitude) / 2;
-                let suma = 0;
-                for (let i in pasos) {
-                    suma = suma + pasos[i].distance.value;
-                    if (suma >= distancia * 1000) {
-                        let decode = pasos[parseInt(i) + 1] != null ? pasos[parseInt(i) + 1] : pasos[i];
-                        let resPunto = poly.decode(
-                            decode.polyline.points
-                        );
-                        resPunto = {
-                            latitude: resPunto[0][0],
-                            longitude: resPunto[0][1]
+                if (responseJson.status != "ZERO_RESULTS") {
+                    let puntos = poly.decode(
+                        responseJson.routes[0].overview_polyline.points
+                    );
+                    let res = puntos.map((punto, index) => {
+                        return {
+                            latitude: punto[0],
+                            longitude: punto[1]
+                        };
+                    });
+                    let pasos = responseJson.routes[0].legs[0].steps;
+                    let distancia = this.getKilometros(11.2174962, -74.1866339, this.state.lugar.direccion.latitude, this.state.lugar.direccion.longitude) / 2;
+                    let suma = 0;
+                    for (let i in pasos) {
+                        suma = suma + pasos[i].distance.value;
+                        if (suma >= distancia * 1000) {
+                            let decode = pasos[parseInt(i) + 1] != null ? pasos[parseInt(i) + 1] : pasos[i];
+                            let resPunto = poly.decode(
+                                decode.polyline.points
+                            );
+                            resPunto = {
+                                latitude: resPunto[0][0],
+                                longitude: resPunto[0][1]
+                            }
+                            this.setState({
+                                puntoZoom: resPunto
+                            });
                         }
-                        this.setState({
-                            puntoZoom: resPunto
-                        });
                     }
+                    this.setState({
+                        distancia: suma
+                    });
+                    this.setState({ res, pasos });
+                    this.setState({ loader: false });
+                    let zoom = (this.state.res.length * 0.15) / 358;
+                    let region = {
+                        latitude: this.state.puntoZoom != null ? this.state.puntoZoom.latitude : 0,
+                        longitude: this.state.puntoZoom != null ? this.state.puntoZoom.longitude : 0,
+                        latitudeDelta: zoom,
+                        longitudeDelta: zoom,
+                    };
+                    this.setState({ region });
+                } else {
+                    this.cargarRuta(true);
                 }
-                this.setState({
-                    distancia: suma
-                });
-                this.setState({ res, pasos });
-                this.setState({ loader: false });
-                let zoom = (this.state.res.length * 0.15) / 358;
-                let region = {
-                    latitude: this.state.puntoZoom != null ? this.state.puntoZoom.latitude : 0,
-                    longitude: this.state.puntoZoom != null ? this.state.puntoZoom.longitude : 0,
-                    latitudeDelta: zoom,
-                    longitudeDelta: zoom,
-                };
-                this.setState({ region });
             }).catch(e => { console.warn(e) });
+    }
+    componentDidMount() {
+        this.cargarRuta();
     }
     render() {
         let div = 4;
